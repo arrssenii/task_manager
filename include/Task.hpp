@@ -1,4 +1,6 @@
-#pragma once
+#ifndef TASK_HPP
+#define TASK_HPP
+
 #include <string>
 
 struct Task {
@@ -7,3 +9,5 @@ struct Task {
     std::string description;
     bool completed;
 };
+
+#endif // TASK_HPP
