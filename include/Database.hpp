@@ -11,15 +11,16 @@ private:
     sqlite3* db;
     std::string dbPath;
 
-    void createTable();  // Внутренний метод для создания таблицы
+    void initialize();  // Внутренний метод для создания таблицы
 
 public:
     Database(const std::string& path);
     ~Database();
 
-    bool addTask(const Task& task);
+    bool addTask(const std::string& title, const std::string& description, const std::string& deadline, const std::string& priority);
     std::vector<Task> getAllTasks();
-    bool updateTask(int id, bool completed, const std::string& newDescription);
+    void listTasks();
+    bool updateTask(int id, const std::string& title, const std::string& description, const std::string& deadline, const std::string& priority, const std::string& status);
     bool deleteTask(int id);
 };
 

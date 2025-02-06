@@ -7,7 +7,9 @@ struct Task {
     int id;
     std::string title;
     std::string description;
-    bool completed;
+    std::string deadline;
+    std::string priority;
+    std::string status;
 };
 
 #endif // TASK_HPP
