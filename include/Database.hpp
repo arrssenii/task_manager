@@ -19,6 +19,8 @@ public:
 
     bool addTask(const std::string& title, const std::string& description, const std::string& deadline, const std::string& priority);
     std::vector<Task> getAllTasks();
+    std::vector<Task> searchTasks(const std::string& keyword);
+    std::vector<Task> filterTasks(const std::string& status = "", const std::string& priority = "", const std::string& deadline = "");
     void listTasks();
     bool updateTask(int id, const std::string& title, const std::string& description, const std::string& deadline, const std::string& priority, const std::string& status);
     bool deleteTask(int id);

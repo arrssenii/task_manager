@@ -9,6 +9,8 @@ void printMenu() {
               << "  list      - Показать список задач\n"
               << "  update    - Обновить задачу\n"
               << "  delete    - Удалить задачу\n"
+              << "  search    - Поиск задач по ключевому слову\n"
+              << "  filter    - Фильтрация задач по статусу или приоритету\n"
               << "  exit      - Выйти из программы\n";
 }
 
@@ -68,6 +70,50 @@ int main() {
             std::cout << "ID задачи для удаления: ";
             std::cin >> id;
             db.deleteTask(id);
+        }
+        else if (command == "search") {
+            std::cin.ignore(); // Очистка буфера перед вводом строки
+            std::string keyword;
+            std::cout << "Введите ключевое слово для поиска: ";
+            std::getline(std::cin, keyword);
+
+            std::vector<Task> tasks = db.searchTasks(keyword);
+            if (tasks.empty()) {
+                std::cout << "Задачи не найдены.\n";
+            } else {
+                std::cout << "ID   Заголовок  Описание  Дедлайн  Приоритет  Статус\n";
+                for (const auto& task : tasks) {
+                    std::cout << task.id << "  " << task.title << "  "
+                              << task.description << "  " << task.deadline << "  "
+                              << task.priority << "  " << task.status << "\n";
+                }
+            }
+        }
+        else if (command == "filter") {
+            std::cin.ignore(); // Очистка буфера перед вводом
+            std::string status, priority, deadline;
+
+            std::cout << "Введите статус (или оставьте пустым): ";
+            std::getline(std::cin, status);
+
+            std::cout << "Введите приоритет (или оставьте пустым): ";
+            std::getline(std::cin, priority);
+
+            std::cout << "Введите дедлайн (или оставьте пустым): ";
+            std::getline(std::cin, deadline);
+
+            std::vector<Task> tasks = db.filterTasks(status, priority, deadline);
+
+            if (tasks.empty()) {
+                std::cout << "Задачи не найдены по заданным параметрам.\n";
+            } else {
+                std::cout << "ID   Заголовок  Описание  Дедлайн  Приоритет  Статус\n";
+                for (const auto& task : tasks) {
+                    std::cout << task.id << "  " << task.title << "  "
+                              << task.description << "  " << task.deadline << "  "
+                              << task.priority << "  " << task.status << "\n";
+                }
+            }
         }
         else if (command == "exit") {
             std::cout << "Выход из программы...\n";

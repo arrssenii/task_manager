@@ -171,3 +171,79 @@ bool Database::deleteTask(int id) {
     if (success) std::cout << "Задача удалена!" << std::endl;
     return success;
 }
+
+std::vector<Task> Database::searchTasks(const std::string& keyword) {
+    std::vector<Task> tasks;
+    std::string sql = "SELECT id, title, description, deadline, priority, status FROM tasks "
+                      "WHERE title LIKE ? OR description LIKE ?;";
+
+    sqlite3_stmt* stmt;
+    if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+        std::cerr << "Ошибка подготовки запроса: " << sqlite3_errmsg(db) << std::endl;
+        return tasks;
+    }
+
+    std::string searchPattern = "%" + keyword + "%";
+    sqlite3_bind_text(stmt, 1, searchPattern.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, searchPattern.c_str(), -1, SQLITE_STATIC);
+
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        Task task;
+        task.id = sqlite3_column_int(stmt, 0);
+        task.title = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+        task.description = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
+        task.deadline = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3));
+        task.priority = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 4));
+        task.status = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 5));
+        tasks.push_back(task);
+    }
+
+    sqlite3_finalize(stmt);
+    return tasks;
+}
+
+std::vector<Task> Database::filterTasks(const std::string& status, const std::string& priority, const std::string& deadline) {
+    std::vector<Task> tasks;
+    std::string query = "SELECT * FROM tasks WHERE 1=1"; // 1=1 нужно, чтобы удобно добавлять условия
+
+    if (!status.empty()) {
+        query += " AND status = ?";
+    }
+    if (!priority.empty()) {
+        query += " AND priority = ?";
+    }
+    if (!deadline.empty()) {
+        query += " AND deadline = ?";
+    }
+
+    sqlite3_stmt* stmt;
+    if (sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+        std::cerr << "Ошибка подготовки запроса: " << sqlite3_errmsg(db) << std::endl;
+        return tasks;
+    }
+
+    int paramIndex = 1;
+    if (!status.empty()) {
+        sqlite3_bind_text(stmt, paramIndex++, status.c_str(), -1, SQLITE_STATIC);
+    }
+    if (!priority.empty()) {
+        sqlite3_bind_text(stmt, paramIndex++, priority.c_str(), -1, SQLITE_STATIC);
+    }
+    if (!deadline.empty()) {
+        sqlite3_bind_text(stmt, paramIndex++, deadline.c_str(), -1, SQLITE_STATIC);
+    }
+
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        Task task;
+        task.id = sqlite3_column_int(stmt, 0);
+        task.title = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+        task.description = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
+        task.deadline = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3));
+        task.priority = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 4));
+        task.status = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 5));
+        tasks.push_back(task);
+    }
+
+    sqlite3_finalize(stmt);
+    return tasks;
+}
