@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <windows.h>  // Для SetConsoleOutputCP
+#include "GUI.hpp"
 #include "Database.hpp"
 
 void printMenu() {
@@ -21,6 +22,9 @@ int main() {
 
     Database db("tasks.db");
     std::string command;
+
+    GUI gui(db);
+    gui.run();
 
     std::cout << "Добро пожаловать в Task Manager!" << std::endl;
     printMenu();
